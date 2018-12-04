@@ -23,11 +23,15 @@ public class ArrivalsService {
 	}
 	
 	
-	public Arrivals getArrivals(int stopId, String lineId) {
+	public Arrivals getArrivals(int stopId, String lineId, int howMany) {
 		Arrivals result = getArrivals(stopId);
 		if (result.getArrivals().keySet().contains(lineId)) {
 			List<Arrival> arrivalsLine = result.getArrivals().get(lineId);
 			result.getArrivals().clear();
+			int aSize = arrivalsLine.size();
+			if (howMany != -1 && aSize > howMany) {
+				arrivalsLine = arrivalsLine.subList(0, howMany);
+			}
 			result.getArrivals().put(lineId, arrivalsLine);
 		}
 		

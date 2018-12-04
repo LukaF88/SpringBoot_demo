@@ -21,6 +21,11 @@ public class ArrivalsController {
 	
 	@RequestMapping("/{stopId}/{lineId}")
 	public Arrivals nextBuses(@PathVariable int stopId, @PathVariable String lineId) {
-		return arrivalService.getArrivals(stopId, lineId);
+		return arrivalService.getArrivals(stopId, lineId, -1);
+	}
+	
+	@RequestMapping("/next/{stopId}/{lineId}")
+	public Arrivals nextBus(@PathVariable int stopId, @PathVariable String lineId) {
+		return arrivalService.getArrivals(stopId, lineId, 1);
 	}
 }
