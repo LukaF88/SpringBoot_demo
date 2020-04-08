@@ -1,4 +1,4 @@
-package learn.course.springboot.example.entity;
+package it.busstops.entity;
 
 public class Arrival {
 	

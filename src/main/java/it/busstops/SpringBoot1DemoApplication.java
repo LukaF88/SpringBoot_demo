@@ -1,4 +1,4 @@
-package learn.course.springboot.example;
+package it.busstops;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

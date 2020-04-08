@@ -1,4 +1,4 @@
-package learn.course.springboot.example.utils;
+package it.busstops.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,8 +16,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import learn.course.springboot.example.entity.Arrival;
-import learn.course.springboot.example.entity.Arrivals;
+import it.busstops.entity.Arrival;
+import it.busstops.entity.Arrivals;
 
 public class ArrivalsUtils {
 
