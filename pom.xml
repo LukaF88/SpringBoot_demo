@@ -15,8 +15,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.1.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<version>2.2.2.RELEASE</version>
+		<relativePath />
 	</parent>
 
 	<properties>
@@ -51,13 +51,89 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>clean-resource</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target name="clean jar">
+								<delete>
+									<fileset dir="${basedir}/build/" includes="*.jar" />
+								</delete>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resource-one</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+						<target name="copy jar">
+							<copy todir="${basedir}/build/">
+								<fileset dir="target/" includes="*.jar" />
+							</copy>
+						</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+				  <execution>
+					<id>docker-build</id>
+					<phase>install</phase>
+					<goals>
+					  <goal>exec</goal>
+					</goals>
+					<configuration>
+					  <executable>docker</executable>
+					  <workingDirectory>${project.basedir}/build</workingDirectory>
+					  <arguments>
+						<argument>build</argument>
+						<argument>-t</argument>
+						<argument>api.zendownloader.com:5000/bus_stop:${project.version}</argument>
+						<argument>.</argument>
+					  </arguments>
+					</configuration>
+				  </execution>
+				  <execution>
+					<id>docker-push</id>
+					<phase>install</phase>
+					<goals>
+					  <goal>exec</goal>
+					</goals>
+					<configuration>
+					  <executable>docker</executable>
+					  <workingDirectory>${project.basedir}/build</workingDirectory>
+					  <arguments>
+						<argument>push</argument>
+						<argument>api.zendownloader.com:5000/bus_stop:${project.version}</argument>
+					  </arguments>
+					</configuration>
+				  </execution>
+				</executions>
+			  </plugin>
 		</plugins>
 	</build>
-
-
 </project>
