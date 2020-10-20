@@ -1,7 +1,6 @@
 package it.busstops.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -43,9 +42,8 @@ public class ArrivalsService {
 		return result;
 	}
 
+	// TODO
 	public Arrivals getArrivals(String lineId, int stopId) {
 		return null;
 	}
-
-
 }
