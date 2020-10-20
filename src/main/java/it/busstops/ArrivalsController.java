@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import it.busstops.entity.Arrivals;
 import it.busstops.entity.Line;
 import it.busstops.entity.LineStops;
+import it.busstops.entity.Roadmap;
 import it.busstops.service.ArrivalsService;
 import it.busstops.utils.LineStopsUtils;
 
@@ -34,7 +35,7 @@ public class ArrivalsController {
 		return LineStopsUtils.getElencoFermateLinea(lineId);
 	}
 	
-	@RequestMapping("/{stopId}/{lineId}")
+	@RequestMapping("linestop/{stopId}/{lineId}")
 	public Arrivals nextBuses(@PathVariable int stopId, @PathVariable String lineId) {
 		return arrivalService.getArrivals(stopId, lineId, -1);
 	}
@@ -42,6 +43,11 @@ public class ArrivalsController {
 	@RequestMapping("/next/{stopId}/{lineId}")
 	public Arrivals nextBus(@PathVariable int stopId, @PathVariable String lineId) {
 		return arrivalService.getArrivals(stopId, lineId, 1);
+	}
+
+	@RequestMapping("/roadmap/{lineId}")
+	public Roadmap roadmap(@PathVariable String lineId) {
+		return arrivalService.getRoadmap(lineId);
 	}
 
 }

@@ -2,7 +2,7 @@ package it.busstops.entity;
 
 
 public class Stop {
-	String id;
+	int id;
 	String name;
 	String description;
 
@@ -22,11 +22,11 @@ public class Stop {
 		this.description = description;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

@@ -1,9 +1,7 @@
 package it.busstops.utils;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -184,7 +182,7 @@ public static LineStops getElencoFermateLinea(String linea) {
 	matcher = pattern.matcher(finalXml);
 	while (matcher.find()){
 		Stop s = new Stop();
-		s.setId(matcher.group(1));
+		s.setId(Integer.valueOf(matcher.group(1)));
 		s.setName(matcher.group(2));
 		s.setDescription(matcher.group(3));
 		result.getStops().add(s);
