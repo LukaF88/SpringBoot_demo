@@ -1,7 +1,9 @@
 package it.busstops.utils;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import it.busstops.entity.Arrival;
 import it.busstops.entity.Arrivals;
+import it.busstops.entity.Line;
 import it.busstops.entity.LineStops;
 import it.busstops.entity.Stop;
 
@@ -100,20 +103,30 @@ public class LineStopsUtils {
 		return doc;
 	}
 
-	public static List<String> getElencoLinee() {
-		String uri = "http://www.gtt.to.it/cms/percorari/urbano";
+	public static List<Line> getElencoLinee() {
 		RestTemplate restTemplate = new RestTemplate();
-		String xml = restTemplate.getForObject(uri, String.class);
+		String xml = restTemplate.getForObject("http://www.gtt.to.it/cms/percorari/urbano", String.class);
+		xml = xml.substring(xml.lastIndexOf("<table"), xml.length()-1);
 
-		final String regex = ">\\W+<td>.*\\W+<strong>([\\w ]+)<\\/strong>";
+		final String regex = "<strong>([\\w \\/]+)<\\/strong>[\\W \\S]*?<\\/td>[\\W \\S .]*?<td>[\\W \\S .]*?<a href=\"\\/cms\\/percorari\\/urbano\\?view=percorsi&amp;bacino=U&amp;linea=(\\w+)&";
 		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		final Matcher matcher = pattern.matcher(xml);
 
-		final ArrayList<String> result = new ArrayList<String>();
+	/*	try (PrintStream out = new PrintStream(new FileOutputStream("debug.txt"))) {
+			out.print(xml);
+		}
+		catch(Exception e) {}
+*/
+		final ArrayList<Line> result = new ArrayList<>();
 
 		while (matcher.find()) {
+			Line l = new Line();
+			l.setName(matcher.group(1));
+			l.setInternalId(matcher.group(2));
+			result.add(l);
+
 			for (int i = 1; i <= matcher.groupCount(); i++) {
-				result.add(matcher.group(i));
+				System.out.println("Group " + i + ": " + matcher.group(i));
 			}
 		}
 		
@@ -124,60 +137,60 @@ public class LineStopsUtils {
 
 public static LineStops getElencoFermateLinea(String linea) {
 
-	LineStops result = new LineStops();
 	String uri = "http://www.gtt.to.it/cms/percorari/urbano";
+	String BASE_URL = "http://www.gtt.to.it";
+	LineStops result = new LineStops();
+	
 	RestTemplate restTemplate = new RestTemplate();
 	String tmpXml = restTemplate.getForObject(uri, String.class);
 
 	String regex = "<a href=\"(.*linea=" + linea + "\\W.*)\"";
 	Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 	Matcher matcher = pattern.matcher(tmpXml);
-	String tmpLink = "";
+	String link = "";
 	while (matcher.find())
-		tmpLink = matcher.group(1);
+		link = matcher.group(1);
 	result.setLine(linea);
-	System.out.println("Link trovato per linea " + linea + ": " + tmpLink);
+	//System.out.println("Link trovato per linea " + linea + ": " + tmpLink);
 
 	// 2ND STEP
-	uri = "http://www.gtt.to.it" + tmpLink;
-	String xml = restTemplate.getForObject(uri, String.class);
+	String xml = restTemplate.getForObject(BASE_URL + link, String.class);
 
-	System.out.println("XML -> " + uri);
+	//System.out.println("XML -> " + uri);
 
 	regex = "(\\/cms\\/percorari\\/urbano\\?view=percorso&amp;linea=" + linea + "&amp;percorso=.*)\"";
-	pattern = Pattern.compile(regex, Pattern.MULTILINE);
-	matcher = pattern.matcher(xml);
-	String link = "";
+	matcher = Pattern.compile(regex, Pattern.MULTILINE).matcher(xml);
+	
 	while (matcher.find())
 		link = matcher.group(0);
 	result.setLine(linea);
-	System.out.println("Link finale trovato per linea " + linea + " -> " + uri);
-	uri = "http://www.gtt.to.it" + link;
+	//System.out.println("Link finale trovato per linea " + linea + " -> " + uri);
 
 	if (StringUtils.isEmpty(link))
 		return result;
 
-// STEP 3
-String finalXml = restTemplate.getForObject(uri, String.class);
-regex = "<a href=\"\\/cms\\/percorari\\/arrivi\\?view=palina&amp;palina=\\w+.*\">(.*)<\\/a>\\s*.*\\s*<td class=\"step\">(.+)<\\/td>.*\\s*<td>(.+)<\\/td>";
-pattern = Pattern.compile(regex, Pattern.MULTILINE);
-matcher = pattern.matcher(finalXml);
-while (matcher.find()){
-	Stop s = new Stop();
-	s.setId(matcher.group(1));
-	s.setName(matcher.group(2));
-	s.setDescription(matcher.group(3));
-	result.getStops().add(s);
-}
+	// STEP 3
+	String finalXml = restTemplate.getForObject(BASE_URL + link, String.class);
+	//finalXml = finalXml.replaceAll("\r", "");
+	//finalXml = finalXml.replaceAll("\n", "");
+
+	matcher = Pattern.compile("\\s{2,}").matcher(finalXml);
+	finalXml = matcher.replaceAll("");
+
+	//System.out.println("DOPO: " + finalXml);
+
+	regex = "<a href=\"\\/cms\\/percorari\\/arrivi\\?view=palina&amp;palina=.*\">([\\w . \\/ -]+)<\\/a>.*<td class=\"step\">([\\w . \\/ -]+)<\\/td><td>([\\w . \\/ \\d -]+)<\\/td>";
+	pattern = Pattern.compile(regex, Pattern.MULTILINE);
+	matcher = pattern.matcher(finalXml);
+	while (matcher.find()){
+		Stop s = new Stop();
+		s.setId(matcher.group(1));
+		s.setName(matcher.group(2));
+		s.setDescription(matcher.group(3));
+		result.getStops().add(s);
+	}
 			
 	return result;
-
-}
-
-	// main di prova
-	public static void main(String[] args){
-		LineStopsUtils.getElencoLinee().forEach(l -> getElencoFermateLinea(l));
 	}
-
 
 }

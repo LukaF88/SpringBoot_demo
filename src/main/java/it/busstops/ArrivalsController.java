@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.busstops.entity.Arrivals;
+import it.busstops.entity.Line;
 import it.busstops.entity.LineStops;
 import it.busstops.service.ArrivalsService;
 import it.busstops.utils.LineStopsUtils;
@@ -19,7 +20,7 @@ public class ArrivalsController {
 	ArrivalsService arrivalService;
 	
 	@RequestMapping("/lines")
-	public List<String> lines() {
+	public List<Line> lines() {
 		return LineStopsUtils.getElencoLinee();
 	}
 

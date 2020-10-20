@@ -6,6 +6,7 @@ import java.util.List;
 
 public class LineStops {
 	String line;
+	String direction;
 	List<Stop> stops;
 
 	public String getLine() {
@@ -26,6 +27,13 @@ public class LineStops {
 		this.stops = stops;
 	}
 
-	
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
 
 }
